@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width,
+initial-scale=1.0,
+maximum-scale=1.0,
+user-scalable=no">
+
+<title>Music Wheel</title>
+
+<style>
+
+/* =========================
+   RESET
+========================= */
+
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    margin:0;
+    overflow:hidden;
+}
+
+body{
+    font-family:Arial,Tahoma,sans-serif;
+    color:white;
+
+    background:
+    radial-gradient(
+        circle at 50% 35%,
+        #39275e 0%,
+        #171329 40%,
+        #08080f 100%
+    );
+}
+
+
+/* =========================
+   BACKGROUND
+========================= */
+
+.glow{
+    position:fixed;
+
+    width:330px;
+    height:330px;
+
+    left:50%;
+    top:32%;
+
+    transform:translate(-50%,-50%);
+
+    border-radius:50%;
+
+    background:rgba(139,92,246,.20);
+
+    filter:blur(100px);
+
+    pointer-events:none;
+}
+
+
+/* =========================
+   APP
+========================= */
+
+.app{
+    width:100%;
+    height:100%;
+
+    max-width:600px;
+
+    margin:auto;
+
+    position:relative;
+
+    overflow:hidden;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.header{
+    position:absolute;
+
+    top:35px;
+    left:0;
+    right:0;
+
+    text-align:center;
+
+    z-index:50;
+}
+
+.header small{
+    color:#aaa4b4;
+
+    font-size:10px;
+
+    letter-spacing:5px;
+}
+
+.header h1{
+    margin:8px 0 0;
+
+    font-size:27px;
+}
+
+
+/* =========================
+   WHEEL AREA
+========================= */
+
+.wheel-area{
+
+    position:absolute;
+
+    top:190px;
+
+    left:0;
+    right:0;
+
+    height:560px;
+
+    touch-action:none;
+
+    user-select:none;
+
+    overflow:visible;
+}
+
+
+/* =========================
+   ARC
+========================= */
+
+.arc{
+
+    position:absolute;
+
+    width:590px;
+    height:590px;
+
+    left:50%;
+    top:350px;
+
+    transform:translate(-50%,-50%);
+
+    border-radius:50%;
+
+    border:1px solid
+    rgba(255,255,255,.10);
+
+    pointer-events:none;
+}
+
+
+/* =========================
+   SELECTION LINE
+========================= */
+
+.selection-line{
+
+    position:absolute;
+
+    left:50%;
+    top:5px;
+
+    transform:translateX(-50%);
+
+    width:4px;
+    height:60px;
+
+    border-radius:20px;
+
+    background:
+    linear-gradient(
+        to bottom,
+        transparent,
+        #bd83ff
+    );
+
+    box-shadow:
+    0 0 12px #a967ff,
+    0 0 30px rgba(169,103,255,.7);
+
+    z-index:30;
+
+    pointer-events:none;
+}
+
+
+/* =========================
+   WHEEL
+========================= */
+
+.wheel{
+
+    position:absolute;
+
+    width:590px;
+    height:590px;
+
+    left:50%;
+    top:350px;
+
+    transform:
+    translate(-50%,-50%);
+
+    pointer-events:none;
+}
+
+
+/* =========================
+   SONG CARD
+========================= */
+
+.song{
+
+    position:absolute;
+
+    width:120px;
+    height:150px;
+
+    text-align:center;
+
+    margin-left:-60px;
+    margin-top:-60px;
+
+    transition:
+    left .35s cubic-bezier(.2,.8,.2,1),
+    top .35s cubic-bezier(.2,.8,.2,1),
+    transform .35s cubic-bezier(.2,.8,.2,1),
+    opacity .25s ease,
+    filter .25s ease;
+
+    pointer-events:auto;
+}
+
+
+/* =========================
+   COVER
+========================= */
+
+.cover{
+
+    width:82px;
+    height:82px;
+
+    margin:auto;
+
+    overflow:hidden;
+
+    border-radius:50%;
+
+    background:#111;
+
+    border:2px solid
+    rgba(255,255,255,.15);
+
+    box-shadow:
+    0 10px 25px rgba(0,0,0,.6);
+
+    transition:.35s ease;
+}
+
+.cover img{
+
+    width:100%;
+    height:100%;
+
+    display:block;
+
+    object-fit:cover;
+}
+
+
+/* =========================
+   SONG TITLE
+========================= */
+
+.song-title{
+
+    width:120px;
+
+    margin-top:9px;
+
+    color:#aaa5b3;
+
+    font-size:12px;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+    transition:.3s ease;
+}
+
+
+/* =========================
+   CURRENT SONG
+========================= */
+
+.song.current{
+
+    z-index:20;
+
+    transform:
+    translate(-50%,-50%)
+    scale(1.15);
+}
+
+.song.current .cover{
+
+    width:110px;
+    height:110px;
+
+    border:
+    3px solid #b679ff;
+
+    box-shadow:
+    0 0 0 6px
+    rgba(157,92,246,.08),
+
+    0 0 30px
+    rgba(157,92,246,.65),
+
+    0 0 65px
+    rgba(157,92,246,.25);
+}
+
+.song.current .song-title{
+
+    color:white;
+
+    font-size:14px;
+
+    font-weight:bold;
+
+    margin-top:12px;
+}
+
+
+/* =========================
+   INFO
+========================= */
+
+.info{
+
+    position:absolute;
+
+    left:0;
+    right:0;
+
+    bottom:145px;
+
+    text-align:center;
+
+    z-index:50;
+}
+
+.info h2{
+
+    margin:0;
+
+    font-size:27px;
+}
+
+.info p{
+
+    margin:7px 0 0;
+
+    color:#9994a5;
+
+    font-size:14px;
+}
+
+
+/* =========================
+   CONTROLS
+========================= */
+
+.controls{
+
+    position:absolute;
+
+    left:0;
+    right:0;
+
+    bottom:55px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:28px;
+
+    z-index:60;
+}
+
+button{
+
+    border:0;
+
+    color:white;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    cursor:pointer;
+
+    transition:.15s;
+}
+
+button:active{
+
+    transform:scale(.86);
+}
+
+
+.nav{
+
+    width:48px;
+    height:48px;
+
+    border-radius:50%;
+
+    background:
+    rgba(255,255,255,.08);
+
+    border:
+    1px solid
+    rgba(255,255,255,.12);
+
+    font-size:22px;
+}
+
+
+.play{
+
+    width:70px;
+    height:70px;
+
+    border-radius:50%;
+
+    background:
+    linear-gradient(
+        135deg,
+        #8b5cf6,
+        #c026d3
+    );
+
+    box-shadow:
+    0 0 30px
+    rgba(139,92,246,.5);
+
+    font-size:24px;
+}
+
+
+/* =========================
+   COUNTER
+========================= */
+
+.counter{
+
+    position:absolute;
+
+    bottom:23px;
+
+    left:0;
+    right:0;
+
+    text-align:center;
+
+    color:#676373;
+
+    font-size:11px;
+
+    letter-spacing:2px;
+
+    z-index:50;
+}
+
+
+/* =========================
+   SMALL SCREENS
+========================= */
+
+@media(max-height:700px){
+
+    .header{
+        top:20px;
+    }
+
+    .wheel-area{
+        top:155px;
+    }
+
+    .info{
+        bottom:125px;
+    }
+
+    .controls{
+        bottom:40px;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="glow"></div>
+
+
+<div class="app">
+
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <small>MUSIC PLAYER</small>
+
+        <h1>اختار أغنيتك</h1>
+
+    </div>
+
+
+    <!-- WHEEL -->
+
+    <div
+        class="wheel-area"
+        id="wheelArea"
+    >
+
+        <div class="selection-line"></div>
+
+        <div class="arc"></div>
+
+        <div
+            class="wheel"
+            id="wheel"
+        ></div>
+
+    </div>
+
+
+    <!-- SONG INFO -->
+
+    <div class="info">
+
+        <h2 id="songName">
+            Midnight
+        </h2>
+
+        <p id="artistName">
+            Night Music
+        </p>
+
+    </div>
+
+
+    <!-- CONTROLS -->
+
+    <div class="controls">
+
+        <button
+            class="nav"
+            id="prev"
+        >
+            ❮
+        </button>
+
+
+        <button
+            class="play"
+            id="play"
+        >
+            ▶
+        </button>
+
+
+        <button
+            class="nav"
+            id="next"
+        >
+            ❯
+        </button>
+
+    </div>
+
+
+    <div
+        class="counter"
+        id="counter"
+    >
+        01 / 07
+    </div>
+
+
+</div>
+
+
+
+<script>
+
+/* =================================================
+                    SONGS
+================================================= */
+
+const songs = [
+
+    {
+        name:"Midnight",
+        artist:"Night Music",
+        image:"https://picsum.photos/id/1015/600/600"
+    },
+
+    {
+        name:"Dreams",
+        artist:"Unknown Artist",
+        image:"https://picsum.photos/id/1016/600/600"
+    },
+
+    {
+        name:"Lost Sky",
+        artist:"Deep Sound",
+        image:"https://picsum.photos/id/1018/600/600"
+    },
+
+    {
+        name:"Moonlight",
+        artist:"Dark Waves",
+        image:"https://picsum.photos/id/1025/600/600"
+    },
+
+    {
+        name:"After Dark",
+        artist:"Night Wave",
+        image:"https://picsum.photos/id/1035/600/600"
+    },
+
+    {
+        name:"Memories",
+        artist:"Unknown",
+        image:"https://picsum.photos/id/1040/600/600"
+    },
+
+    {
+        name:"Ocean",
+        artist:"Blue Sound",
+        image:"https://picsum.photos/id/1043/600/600"
+    }
+
+];
+
+
+/* =================================================
+                    ELEMENTS
+================================================= */
+
+const wheel =
+    document.getElementById("wheel");
+
+const wheelArea =
+    document.getElementById("wheelArea");
+
+const songName =
+    document.getElementById("songName");
+
+const artistName =
+    document.getElementById("artistName");
+
+const counter =
+    document.getElementById("counter");
+
+const nextButton =
+    document.getElementById("next");
+
+const prevButton =
+    document.getElementById("prev");
+
+const playButton =
+    document.getElementById("play");
+
+
+/* =================================================
+                    SETTINGS
+================================================= */
+
+const RADIUS = 295;
+
+const STEP = 25;
+
+
+/*
+الأغنية الحالية
+*/
+
+let current = 0;
+
+
+/*
+الحركة المؤقتة أثناء سحب الإصبع
+*/
+
+let dragAmount = 0;
+
+
+/*
+الكروت
+*/
+
+const cards = [];
+
+
+/* =================================================
+              CREATE SONG CARDS
+================================================= */
+
+songs.forEach(function(song){
+
+    const card =
+        document.createElement("div");
+
+    card.className = "song";
+
+
+    card.innerHTML = `
+
+        <div class="cover">
+
+            <img
+                src="${song.image}"
+                draggable="false"
+            >
+
+        </div>
+
+        <div class="song-title">
+            ${song.name}
+        </div>
+
+    `;
+
+
+    wheel.appendChild(card);
+
+    cards.push(card);
+
+});
+
+
+/* =================================================
+             DISTANCE FROM CURRENT
+================================================= */
+
+function getDistance(index){
+
+    let distance =
+        index - current;
+
+
+    const total =
+        songs.length;
+
+
+    while(distance > total / 2){
+
+        distance -= total;
+
+    }
+
+
+    while(distance < -total / 2){
+
+        distance += total;
+
+    }
+
+
+    return distance;
+
+}
+
+
+/* =================================================
+                    RENDER
+================================================= */
+
+function render(){
+
+    cards.forEach(function(card,index){
+
+        const distance =
+            getDistance(index);
+
+
+        /*
+        إضافة حركة الإصبع الحالية
+        */
+
+        const visual =
+            distance +
+            dragAmount / STEP;
+
+
+        /*
+        إخفاء الأغاني البعيدة
+        */
+
+        if(
+            visual < -2.5 ||
+            visual > 2.5
+        ){
+
+            card.style.opacity = "0";
+
+            return;
+
+        }
+
+
+        /*
+        زاوية الأغنية
+        */
+
+        const angle =
+            270 +
+            visual * STEP;
+
+
+        const radians =
+            angle * Math.PI / 180;
+
+
+        const x =
+            Math.cos(radians) *
+            RADIUS;
+
+
+        const y =
+            Math.sin(radians) *
+            RADIUS;
+
+
+        /*
+        المكان
+        */
+
+        card.style.left =
+            "calc(50% + " +
+            x +
+            "px)";
+
+
+        card.style.top =
+            "calc(50% + " +
+            y +
+            "px)";
+
+
+        /*
+        الحجم
+        */
+
+        const d =
+            Math.abs(visual);
+
+
+        let scale;
+
+
+        if(d < .15){
+
+            scale = 1.15;
+
+        }
+        else if(d < 1.2){
+
+            scale = .80;
+
+        }
+        else{
+
+            scale = .62;
+
+        }
+
+
+        card.style.transform =
+            "translate(-50%,-50%) " +
+            "scale(" + scale + ")";
+
+
+        /*
+        الشكل
+        */
+
+        if(d < .15){
+
+            card.style.opacity = "1";
+
+            card.style.filter =
+                "brightness(1.1)";
+
+            card.classList.add("current");
+
+            card.style.zIndex = "10";
+
+        }
+        else if(d < 1.2){
+
+            card.style.opacity = ".8";
+
+            card.style.filter =
+                "brightness(.7)";
+
+            card.classList.remove("current");
+
+            card.style.zIndex = "5";
+
+        }
+        else{
+
+            card.style.opacity = ".45";
+
+            card.style.filter =
+                "brightness(.45)";
+
+            card.classList.remove("current");
+
+            card.style.zIndex = "2";
+
+        }
+
+    });
+
+
+    /*
+    معلومات الأغنية
+    */
+
+    songName.textContent =
+        songs[current].name;
+
+    artistName.textContent =
+        songs[current].artist;
+
+
+    counter.textContent =
+        String(current + 1)
+        .padStart(2,"0")
+        +
+        " / "
+        +
+        String(songs.length)
+        .padStart(2,"0");
+
+}
+
+
+/* =================================================
+                CHANGE SONG
+================================================= */
+
+function changeSong(direction){
+
+    current += direction;
+
+
+    if(current < 0){
+
+        current =
+            songs.length - 1;
+
+    }
+
+
+    if(current >= songs.length){
+
+        current = 0;
+
+    }
+
+
+    dragAmount = 0;
+
+    render();
+
+}
+
+
+/* =================================================
+                  TOUCH START
+================================================= */
+
+let touching = false;
+
+let startX = 0;
+
+let startDrag = 0;
+
+
+wheelArea.addEventListener(
+    "touchstart",
+    function(e){
+
+        touching = true;
+
+        startX =
+            e.touches[0].clientX;
+
+        startDrag =
+            dragAmount;
+
+
+        cards.forEach(function(card){
+
+            card.style.transition =
+                "none";
+
+        });
+
+    },
+    {passive:true}
+);
+
+
+/* =================================================
+                   TOUCH MOVE
+================================================= */
+
+wheelArea.addEventListener(
+    "touchmove",
+    function(e){
+
+        if(!touching){
+            return;
+        }
+
+
+        const x =
+            e.touches[0].clientX;
+
+
+        const difference =
+            x - startX;
+
+
+        /*
+        العجلة تتحرك مباشرة مع الإصبع
+        */
+
+        dragAmount =
+            startDrag +
+            difference * 0.45;
+
+
+        /*
+        لو وصلنا لأغنية أخرى
+        */
+
+        while(
+            dragAmount <= -STEP
+        ){
+
+            current++;
+
+            if(
+                current >= songs.length
+            ){
+
+                current = 0;
+
+            }
+
+            dragAmount += STEP;
+
+        }
+
+
+        while(
+            dragAmount >= STEP
+        ){
+
+            current--;
+
+            if(current < 0){
+
+                current =
+                    songs.length - 1;
+
+            }
+
+            dragAmount -= STEP;
+
+        }
+
+
+        render();
+
+    },
+    {passive:true}
+);
+
+
+/* =================================================
+                    TOUCH END
+================================================= */
+
+wheelArea.addEventListener(
+    "touchend",
+    function(){
+
+        if(!touching){
+            return;
+        }
+
+        touching = false;
+
+
+        cards.forEach(function(card){
+
+            card.style.transition = "";
+
+        });
+
+
+        /*
+        تثبيت الحركة
+        */
+
+        const amount =
+            dragAmount;
+
+
+        if(Math.abs(amount) > STEP / 2){
+
+            if(amount < 0){
+
+                current++;
+
+                if(
+                    current >= songs.length
+                ){
+                    current = 0;
+                }
+
+            }
+            else{
+
+                current--;
+
+                if(current < 0){
+
+                    current =
+                        songs.length - 1;
+
+                }
+
+            }
+
+        }
+
+
+        dragAmount = 0;
+
+        render();
+
+    }
+);
+
+
+/* =================================================
+                    BUTTONS
+================================================= */
+
+nextButton.addEventListener(
+    "click",
+    function(){
+
+        changeSong(1);
+
+    }
+);
+
+
+prevButton.addEventListener(
+    "click",
+    function(){
+
+        changeSong(-1);
+
+    }
+);
+
+
+/* =================================================
+                    PLAY BUTTON
+================================================= */
+
+let playing = false;
+
+
+playButton.addEventListener(
+    "click",
+    function(){
+
+        playing = !playing;
+
+
+        playButton.textContent =
+            playing
+            ? "❚❚"
+            : "▶";
+
+    }
+);
+
+
+/* =================================================
+                     START
+================================================= */
+
+render();
+
+</script>
+
+</body>
+</html>
